@@ -28,6 +28,34 @@
         Turn geolocation support on and off.
       </description>
     </key>
+    <key name="alarm-sound-folder" type="s">
+      <default>""</default>
+      <summary>Alarm sound folder</summary>
+      <description>
+        Path to folder containing custom alarm sound files (.ogg format).
+      </description>
+    </key>
+    <key name="alarm-sound-file" type="s">
+      <default>""</default>
+      <summary>Alarm sound file</summary>
+      <description>
+        Selected alarm sound file name from the alarm-sound-folder.
+      </description>
+    </key>
+    <key name="timer-sound-folder" type="s">
+      <default>""</default>
+      <summary>Timer sound folder</summary>
+      <description>
+        Path to folder containing custom timer sound files (.ogg format).
+      </description>
+    </key>
+    <key name="timer-sound-file" type="s">
+      <default>""</default>
+      <summary>Timer sound file</summary>
+      <description>
+        Selected timer sound file name from the timer-sound-folder.
+      </description>
+    </key>
   </schema>
   <enum id="org.gnome.clocks.panelid">
     <value nick="world" value="0"/>

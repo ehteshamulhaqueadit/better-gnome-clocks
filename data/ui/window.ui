@@ -25,6 +25,11 @@
           </object>
         </child>
         <child>
+          <object class="ClocksTimerRingingPanel" id="timer_ringing_panel">
+            <signal name="dismiss" handler="timer_dismissed"/>
+          </object>
+        </child>
+        <child>
           <object class="AdwLeaflet" id="world_leaflet">
             <property name="can-unfold">False</property>
             <property name="can-navigate-back">True</property>

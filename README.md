@@ -1,13 +1,157 @@
-# GNOME Clocks
+# Better GNOME Clocks
 
-A simple clock application for GNOME. It includes world clocks, alarms,
-a stopwatch and a timer.
+An enhanced version of GNOME Clocks with custom sound support, continuous looping sounds, and improved timer notifications.
 
-<a href='https://flathub.org/apps/details/org.gnome.clocks'><img width='190px' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-i-en.png'/></a>
+## Features
 
-## Useful links
+### ✨ Enhanced Features
+- **Custom Timer Sounds**: Set your own sound file for timer completion
+- **Custom Alarm Sounds**: Set your own sound file for alarms  
+- **Continuous Sound Looping**: Both alarm and timer sounds loop continuously until stopped
+- **Timer Ringing Modal**: Full-screen modal panel when timer completes (like alarm panel)
+- **Sound Preferences**: Easy-to-use interface for managing custom sounds with preview
+- **Non-blocking Playback**: Sounds play in background threads without freezing UI
 
-- Homepage: <https://wiki.gnome.org/Apps/Clocks>
-- Report issues: <https://gitlab.gnome.org/GNOME/gnome-clocks/issues/>
-- Donate: <https://www.gnome.org/friends/>
-- Translate: <https://wiki.gnome.org/TranslationProject>
+### 🎵 Sound Management
+- Browse and select custom sound files (.ogg, .mp3, .wav)
+- Preview sounds before applying
+- Fallback to system sounds if custom sound not available
+- Continuous looping until user clicks Stop/Snooze
+
+### 🔔 Timer Enhancements
+- Visual modal panel appears when timer completes
+- Large "Stop" button to dismiss and stop sound
+- Sound loops continuously until stopped
+- Consistent UX with alarm ringing panel
+
+## Installation
+
+### Dependencies
+
+```bash
+# Ubuntu/Debian
+sudo apt install meson valac libgtk-4-dev libadwaita-1-dev \
+    libgweather-4-dev libgnome-desktop-4-dev libgeoclue-2-dev \
+    libgeocode-glib-dev gsound-dev
+
+# Fedora
+sudo dnf install meson vala gtk4-devel libadwaita-devel \
+    libgweather4-devel gnome-desktop4-devel geoclue2-devel \
+    geocode-glib-devel gsound-devel
+```
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd better-gnome-clocks
+
+# Build
+meson build
+ninja -C build
+
+# Install (optional)
+sudo ninja -C build install
+
+# Or run without installing
+glib-compile-schemas build/data
+env GSETTINGS_SCHEMA_DIR=build/data:/usr/share/glib-2.0/schemas \
+    XDG_DATA_DIRS=build/share:/usr/share \
+    ./build/src/gnome-clocks
+```
+
+## Usage
+
+### Setting Custom Sounds
+
+1. Open Better GNOME Clocks
+2. Click the menu button (⋮) in the header bar
+3. Select **Preferences**
+4. Go to the **Sound** tab
+5. Click **Choose File** for Timer or Alarm sound
+6. Select your audio file (.ogg, .mp3, .wav)
+7. Click **Preview** to test the sound
+8. Close preferences - changes are saved automatically
+
+### Using Timer with Modal
+
+1. Go to **Timer** tab
+2. Create a new timer
+3. Start the timer
+4. When timer completes:
+   - Full-screen modal panel appears
+   - Custom sound plays and loops continuously
+   - Click **Stop** button to dismiss and stop sound
+
+### Using Alarms
+
+1. Go to **Alarms** tab
+2. Create or edit an alarm
+3. Set custom sound in preferences
+4. When alarm triggers:
+   - Sound loops continuously
+   - Click **Stop** or **Snooze** to dismiss
+
+## Technical Details
+
+### Architecture Changes
+
+**New Files:**
+- `src/sound-manager.vala` - Manages custom sound paths and GSettings
+- `src/timer-ringing-panel.vala` - Timer completion modal panel component
+- `data/ui/timer-ringing-panel.ui` - Timer modal UI layout
+- `data/ui/sound-settings.ui` - Sound preferences UI
+
+**Modified Files:**
+- `src/utils.vala` - Enhanced Bell class with custom sounds and continuous looping
+- `src/timer-face.vala` - Integrated sound manager and ringing panel signals
+- `src/alarm-face.vala` - Integrated custom sound support
+- `src/preferences-dialog.vala` - Added sound settings tab
+- `src/window.vala` - Added timer ringing panel display logic
+
+### Sound Playback Implementation
+
+- **Backend**: Direct `paplay` system calls for reliability
+- **Threading**: GLib.Thread for non-blocking background playback
+- **Looping**: do-while loop with cancellable checks
+- **Cleanup**: pkill to terminate paplay processes on stop
+- **Fallback**: Custom Sound → System Sound → GSound
+
+### Signal Flow (Timer)
+
+```
+Timer Elapses
+    ↓
+timer-item emits ring()
+    ↓
+timer-face.ring_handler()
+    ↓
+Creates Bell with custom sound
+    ↓
+bell.ring() starts looping playback
+    ↓
+timer-face emits ring(Item)
+    ↓
+window.show_timer_ringing_panel()
+    ↓
+User clicks Stop
+    ↓
+timer.stop_timer_sound() → bell.stop()
+    ↓
+Sound stops, modal dismisses
+```
+
+## Differences from Original GNOME Clocks
+
+1. **Custom Sounds**: Original only uses system sounds
+2. **Continuous Looping**: Original may play once, this loops until stopped
+3. **Timer Modal**: Original shows notification, this shows full-screen modal
+4. **Sound Preferences**: New UI for managing custom sounds
+5. **Background Playback**: Non-blocking audio using threads
+
+## Credits
+
+Based on GNOME Clocks by the GNOME Project.
+
+Enhanced with custom sound support and improved UX.

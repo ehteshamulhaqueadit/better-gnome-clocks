@@ -110,8 +110,8 @@ public class Item : Object, ContentItem {
                 return false;
             }
             if (e >= span) {
-                reset ();
                 ring ();
+                reset ();
                 timeout_id = 0;
                 return false;
             }

@@ -110,7 +110,15 @@ private class Item : Object, ContentItem {
     }
 
     private void setup_bell () {
-        bell = new Utils.Bell ("alarm-clock-elapsed");
+        var sound_manager = new Utils.SoundManager ();
+        var custom_sound_path = sound_manager.get_alarm_sound_path ();
+        
+        if (custom_sound_path.length > 0) {
+            bell = new Utils.Bell ("alarm-clock-elapsed", custom_sound_path);
+        } else {
+            bell = new Utils.Bell ("alarm-clock-elapsed");
+        }
+        
         notification = new GLib.Notification (_("Alarm"));
         notification.set_body (name);
         notification.set_priority (HIGH);

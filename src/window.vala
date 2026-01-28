@@ -25,6 +25,7 @@ public class Window : Adw.ApplicationWindow {
         { "show-primary-menu", on_show_primary_menu_activate },
         { "new", on_new_activate },
         { "back", on_back_activate },
+        { "preferences", on_preferences_activate },
         { "help", on_help_activate },
         { "navigate-forward", on_navigate_forward },
         { "navigate-backward", on_navigate_backward },
@@ -49,6 +50,8 @@ public class Window : Adw.ApplicationWindow {
     private unowned World.Standalone world_standalone;
     [GtkChild]
     private unowned Alarm.RingingPanel alarm_ringing_panel;
+    [GtkChild]
+    private unowned Timer.RingingPanel timer_ringing_panel;
     [GtkChild]
     private unowned Stopwatch.Face stopwatch;
     [GtkChild]
@@ -114,9 +117,11 @@ public class Window : Adw.ApplicationWindow {
             stopwatch_stack_page.needs_attention = (stopwatch.state == Stopwatch.Face.State.RUNNING);
         });
 
-        timer.ring.connect ((w) => {
+        timer.ring.connect ((w, t) => {
             close_standalone ();
             stack.visible_child = w;
+            timer_ringing_panel.timer = t;
+            alarm_leaflet.visible_child = timer_ringing_panel;
         });
 
 
@@ -253,6 +258,11 @@ public class Window : Adw.ApplicationWindow {
         Gtk.show_uri (this, "help:gnome-clocks", Gdk.CURRENT_TIME);
     }
 
+    private void on_preferences_activate () {
+        var preferences = new PreferencesDialog (this);
+        preferences.show ();
+    }
+
     private void on_about_activate () {
         const string COPYRIGHT = "Copyright \xc2\xa9 2011 Collabora Ltd.\n" +
                                  "Copyright \xc2\xa9 2012-2013 Collabora Ltd., Seif Lotfy, Emily Gonyer\n" +
@@ -341,6 +351,12 @@ public class Window : Adw.ApplicationWindow {
 
     [GtkCallback]
     private void alarm_dismissed () {
+        alarm_leaflet.visible_child = world_leaflet;
+    }
+
+    [GtkCallback]
+    private void timer_dismissed () {
+        timer.stop_timer_sound ();
         alarm_leaflet.visible_child = world_leaflet;
     }
 

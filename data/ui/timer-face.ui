@@ -33,6 +33,17 @@
                     </style>
                   </object>
                 </child>
+                <child>
+                  <object class="GtkButton" id="stop_button">
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="icon_name">media-playback-stop-symbolic</property>
+                    <style>
+                      <class name="circular"/>
+                      <class name="large-button"/>
+                    </style>
+                  </object>
+                </child>
               </object>
             </property>
           </object>

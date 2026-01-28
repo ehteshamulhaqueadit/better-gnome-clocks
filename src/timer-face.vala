@@ -30,6 +30,8 @@ public class Face : Adw.Bin, Clocks.Clock {
     [GtkChild]
     private unowned Gtk.Button start_button;
     [GtkChild]
+    private unowned Gtk.Button stop_button;
+    [GtkChild]
     private unowned Gtk.Stack stack;
 
     public PanelId panel_id { get; construct set; }
@@ -41,27 +43,46 @@ public class Face : Adw.Bin, Clocks.Clock {
     private ContentStore timers;
     private GLib.Settings settings;
     private Utils.Bell bell;
+    private Utils.SoundManager sound_manager;
     private GLib.Notification notification;
+    private Item? ringing_timer = null;
+
+    internal signal void ring (Item item);
 
     construct {
         panel_id = TIMER;
         timer_setup = new Setup ();
 
         settings = new GLib.Settings ("org.gnome.clocks");
+        sound_manager = new Utils.SoundManager ();
         timers = new ContentStore ();
 
         timers_list.bind_model (timers, (timer) => {
             var row = new Row ((Item) timer);
             row.deleted.connect (() => remove_timer ((Item) timer));
             row.edited.connect (() => save ());
-            ((Item)timer).ring.connect (() => ring ());
+            ((Item)timer).ring.connect (() => ring_handler ());
             ((Item)timer).notify["state"].connect (() => {
                 this.is_running = this.get_total_active_timers () != 0;
+                // Stop bell only when timer is paused (not when stopped after completion)
+                var item = (Item) timer;
+                if (item.state == Item.State.PAUSED) {
+                    GLib.Idle.add (() => {
+                        bell.stop ();
+                        return GLib.Source.REMOVE;
+                    });
+                }
             });
             return row;
         });
 
-        timers.items_changed.connect ( (added, removed, position) => {
+        stop_button.set_sensitive (false);
+        stop_button.clicked.connect (() => {
+            debug ("Stop button clicked, stopping bell.");
+            bell.stop ();
+        });
+
+        timers.items_changed.connect ((added, removed, position) => {
             if (this.timers.get_n_items () > 0) {
                 stack.visible_child_name = "timers";
                 this.button_mode = NEW;
@@ -70,9 +91,9 @@ public class Face : Adw.Bin, Clocks.Clock {
                 this.button_mode = NONE;
             }
             save ();
+            stop_button.set_sensitive (timers.get_n_items () > 0);
         });
 
-        bell = new Utils.Bell ("complete");
         notification = new GLib.Notification (_("Time is up!"));
         notification.set_body (_("Timer countdown finished"));
         notification.set_priority (HIGH);
@@ -129,10 +150,42 @@ public class Face : Adw.Bin, Clocks.Clock {
         settings.set_value ("timers", timers.serialize ());
     }
 
-    public virtual signal void ring () {
-        var app = (Clocks.Application) GLib.Application.get_default ();
-        app.send_notification ("timer-is-up", notification);
-        bell.ring_once ();
+    public void ring_handler () {
+        ringing_timer = null;
+        
+        // Find which timer just rang (before it gets reset)
+        timers.foreach ((item) => {
+            var t = (Item) item;
+            if (t.state == Item.State.RUNNING && ringing_timer == null) {
+                ringing_timer = t;
+                return;
+            }
+        });
+        
+        if (ringing_timer == null) {
+            return;
+        }
+        
+        var window = (Clocks.Window) get_root ();
+        if (!window.is_active) {
+            var app = (Clocks.Application) GLib.Application.get_default ();
+            app.send_notification ("timer-is-up", notification);
+        }
+        
+        // Get custom timer sound path and create bell
+        var custom_sound_path = sound_manager.get_timer_sound_path ();
+        bell = new Utils.Bell ("alarm-clock-elapsed", custom_sound_path);
+        bell.ring ();
+        
+        // Show ringing panel
+        ring (ringing_timer);
+    }
+    
+    public void stop_timer_sound () {
+        if (bell != null) {
+            bell.stop ();
+        }
+        ringing_timer = null;
     }
 
     public override bool grab_focus () {

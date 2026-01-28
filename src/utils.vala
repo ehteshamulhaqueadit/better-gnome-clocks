@@ -379,10 +379,13 @@ public class Weekdays {
 public class Bell : Object {
     private GSound.Context? gsound;
     private GLib.Cancellable cancellable;
+    private GLib.Thread<bool>? playback_thread;
     private string soundtheme;
     private string sound;
+    private string? custom_sound_path;
+    private bool is_playing;
 
-    public Bell (string soundid) {
+    public Bell (string soundid, string? custom_path = null) {
         try {
             gsound = new GSound.Context ();
         } catch (GLib.Error e) {
@@ -392,11 +395,103 @@ public class Bell : Object {
         var settings = new GLib.Settings ("org.gnome.desktop.sound");
         soundtheme = settings.get_string ("theme-name");
         sound = soundid;
+        custom_sound_path = custom_path;
+        is_playing = false;
+        playback_thread = null;
         cancellable = new GLib.Cancellable ();
+        debug ("Bell created with sound: %s, custom_path: %s, theme: %s", soundid, custom_path ?? "(none)", soundtheme);
+    }
+
+    // Play sound in background thread to prevent UI freeze
+    private void play_sound_in_background (bool repeat) {
+        // Stop any existing playback before starting new one
+        if (is_playing) {
+            debug ("Stopping previous playback before starting new one");
+            stop ();
+        }
+        
+        is_playing = true;
+        playback_thread = new GLib.Thread<bool> ("bell-playback", () => {
+            debug ("Background thread: starting play_sound_sync");
+            try {
+                play_sound_sync (repeat);
+            } catch (GLib.Error e) {
+                warning ("Error in background thread: %s", e.message);
+            }
+            is_playing = false;
+            debug ("Background thread: finished");
+            return true;
+        });
+    }
+
+    // Synchronous sound playback (runs in background thread)
+    private void play_sound_sync (bool repeat) {
+        do {
+            // Try to play custom sound if available
+            if (custom_sound_path != null && custom_sound_path.length > 0) {
+                debug ("Attempting to play custom sound: %s", custom_sound_path);
+                if (GLib.FileUtils.test (custom_sound_path, GLib.FileTest.EXISTS)) {
+                    try {
+                        string[] spawn_args = {"paplay", custom_sound_path};
+                        int exit_status;
+                        GLib.Process.spawn_sync (null, spawn_args, null, GLib.SpawnFlags.SEARCH_PATH, null, null, null, out exit_status);
+                        debug ("Custom sound played, exit status: %d", exit_status);
+                        
+                        // If not repeating or cancelled, exit
+                        if (!repeat || cancellable.is_cancelled ()) {
+                            return;
+                        }
+                        // Small delay between repeats
+                        GLib.Thread.usleep (500000); // 0.5 second
+                        continue;
+                    } catch (GLib.Error e) {
+                        warning ("Error playing custom sound: %s", e.message);
+                    }
+                }
+            }
+
+            // Fallback to system sound with paplay
+            string sound_file = "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga";
+            if (GLib.FileUtils.test (sound_file, GLib.FileTest.EXISTS)) {
+                try {
+                    string[] spawn_args = {"paplay", sound_file};
+                    int exit_status;
+                    GLib.Process.spawn_sync (null, spawn_args, null, GLib.SpawnFlags.SEARCH_PATH, null, null, null, out exit_status);
+                    debug ("System sound played with paplay, exit status: %d", exit_status);
+                    
+                    // If not repeating or cancelled, exit
+                    if (!repeat || cancellable.is_cancelled ()) {
+                        return;
+                    }
+                    // Small delay between repeats
+                    GLib.Thread.usleep (500000); // 0.5 second
+                    continue;
+                } catch (GLib.Error e) {
+                    warning ("Error playing system sound: %s", e.message);
+                }
+            }
+            
+            // If we get here and repeat is true, break to avoid infinite loop with no sound
+            break;
+        } while (repeat && !cancellable.is_cancelled ());
+
+        // Final fallback to GSound
+        if (gsound != null) {
+            try {
+                debug ("Playing sound with GSound: %s", sound);
+                ((GSound.Context) gsound).play_simple (cancellable,
+                                                       GSound.Attribute.EVENT_ID, sound,
+                                                       GSound.Attribute.CANBERRA_XDG_THEME_NAME, soundtheme,
+                                                       GSound.Attribute.MEDIA_ROLE, "alarm");
+            } catch (GLib.Error e) {
+                warning ("Error playing with GSound: %s", e.message);
+            }
+        }
     }
 
     private async void ring_real (bool repeat) {
-        if (gsound == null) {
+        if (gsound == null && (custom_sound_path == null || custom_sound_path.length == 0)) {
+            debug ("ring_real called but no sound available");
             return;
         }
 
@@ -405,29 +500,51 @@ public class Bell : Object {
         }
 
         try {
-            do {
-                yield ((GSound.Context) gsound).play_full (cancellable,
-                                                           GSound.Attribute.EVENT_ID, sound,
-                                                           GSound.Attribute.CANBERRA_XDG_THEME_NAME, soundtheme,
-                                                           GSound.Attribute.MEDIA_ROLE, "alarm");
-            } while (repeat);
-        } catch (GLib.IOError.CANCELLED e) {
-            // ignore
+            // Play sound in background thread with repeat option
+            debug ("ring_real: starting playback with repeat=%s", repeat.to_string());
+            play_sound_in_background (repeat);
         } catch (GLib.Error e) {
-            warning ("Error playing sound: %s", e.message);
+            warning ("Error in ring_real: %s", e.message);
         }
     }
 
     public void ring_once () {
-        ring_real.begin (false);
+        debug ("ring_once called - starting playback in background thread");
+        is_playing = true;
+        playback_thread = new GLib.Thread<bool> ("bell-ringonce", () => {
+            debug ("Ring thread: playing sound");
+            play_sound_sync (false);
+            is_playing = false;
+            debug ("Ring thread: sound complete");
+            return true;
+        });
+    }
+    
+    // Play once for preview (stops existing playback)
+    public void play_once () {
+        debug ("play_once called for preview");
+        play_sound_in_background (false);
     }
 
     public void ring () {
+        debug ("ring called with sound: %s", sound);
         ring_real.begin (true);
     }
 
     public void stop () {
+        debug ("Bell.stop() called");
+        is_playing = false;
         cancellable.cancel ();
+        
+        // Try to terminate paplay processes
+        try {
+            string[] pkill_args = {"pkill", "-f", "paplay"};
+            int exit_status;
+            GLib.Process.spawn_sync (null, pkill_args, null, GLib.SpawnFlags.SEARCH_PATH, null, null, null, out exit_status);
+            debug ("pkill paplay, exit status: %d", exit_status);
+        } catch (GLib.Error e) {
+            debug ("Error stopping paplay: %s", e.message);
+        }
     }
 }
 

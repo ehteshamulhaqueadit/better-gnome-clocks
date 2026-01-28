@@ -1,12 +1,12 @@
-# Contributing
-======
+# Contributing to Better GNOME Clocks
 
-This file is intended to help new developers to get started with developing for
-Clocks. Feel free to skip sections if you know what they are about.
+Thank you for your interest in contributing to Better GNOME Clocks! This guide will help you get started.
 
-Another good source for general information is:
+## Quick Links
 
- https://wiki.gnome.org/Apps/Clocks
+- **Source Code**: https://github.com/YOUR_USERNAME/better-gnome-clocks
+- **Issue Tracker**: https://github.com/YOUR_USERNAME/better-gnome-clocks/issues
+- **Original GNOME Clocks**: https://wiki.gnome.org/Apps/Clocks
 
 1. How to Provide a Good Patch
 ==============================

@@ -11,9 +11,11 @@
     <file preprocess="xml-stripblanks">ui/alarm-row.ui</file>
     <file preprocess="xml-stripblanks">ui/alarm-setup-dialog.ui</file>
     <file preprocess="xml-stripblanks">ui/header-bar.ui</file>
+    <file preprocess="xml-stripblanks">ui/sound-settings.ui</file>
     <file preprocess="xml-stripblanks">ui/stopwatch-face.ui</file>
     <file preprocess="xml-stripblanks">ui/stopwatch-laps-row.ui</file>
     <file preprocess="xml-stripblanks">ui/timer-face.ui</file>
+    <file preprocess="xml-stripblanks">ui/timer-ringing-panel.ui</file>
     <file preprocess="xml-stripblanks">ui/timer-row.ui</file>
     <file preprocess="xml-stripblanks">ui/timer-setup.ui</file>
     <file preprocess="xml-stripblanks">ui/window.ui</file>
@@ -22,6 +24,8 @@
     <file preprocess="xml-stripblanks">ui/world-location-dialog-row.ui</file>
     <file preprocess="xml-stripblanks">ui/world-row.ui</file>
     <file preprocess="xml-stripblanks">ui/world-standalone.ui</file>
+    <file>sounds/complete.oga</file>
+    <file>sounds/silent</file>
   </gresource>
   <gresource prefix="/org/gnome/clocks/icons/16x16/actions/">
     <!-- The symbolic icons correctly centered, used in empty views -->

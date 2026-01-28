@@ -13,7 +13,8 @@ install_data(
 
 resource_files = files('gnome-clocks.gresource.xml')
 resources = gnome.compile_resources('org.gnome.clocks', resource_files,
-  c_name: 'resources'
+  c_name: 'resources',
+  source_dir: meson.current_source_dir()
 )
 
 desktop_conf = configuration_data()

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="adwaita" version="1.0"/>
+
+  <!-- Alarm Sound Settings Row -->
+  <object class="GtkBox" id="alarm_sound_box">
+    <property name="orientation">vertical</property>
+    <property name="spacing">12</property>
+    <property name="margin-top">12</property>
+    <property name="margin-bottom">12</property>
+    <property name="margin-start">12</property>
+    <property name="margin-end">12</property>
+    
+    <child>
+      <object class="GtkLabel">
+        <property name="label" translatable="yes">Alarm Sound</property>
+        <property name="xalign">0</property>
+        <style>
+          <class name="title-2"/>
+        </style>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+        
+        <child>
+          <object class="GtkLabel">
+            <property name="label" translatable="yes">Sound Folder</property>
+            <property name="xalign">0</property>
+            <style>
+              <class name="caption"/>
+            </style>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">6</property>
+
+            <child>
+              <object class="GtkEntry" id="alarm_folder_entry">
+                <property name="placeholder-text" translatable="yes">Select a folder</property>
+                <property name="editable">false</property>
+                <property name="hexpand">true</property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkButton" id="alarm_folder_button">
+                <property name="label" translatable="yes">Browse</property>
+                <property name="tooltip-text" translatable="yes">Choose folder containing .ogg sound files</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+
+        <child>
+          <object class="GtkLabel">
+            <property name="label" translatable="yes">Sound File</property>
+            <property name="xalign">0</property>
+            <style>
+              <class name="caption"/>
+            </style>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkComboBoxText" id="alarm_sound_combo">
+            <property name="active">0</property>
+            <property name="tooltip-text" translatable="yes">Select alarm sound file</property>
+          </object>
+        </child>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkButton" id="alarm_preview_button">
+        <property name="label" translatable="yes">Preview Sound</property>
+        <property name="tooltip-text" translatable="yes">Play a preview of the selected alarm sound</property>
+        <style>
+          <class name="suggested-action"/>
+        </style>
+      </object>
+    </child>
+  </object>
+
+  <!-- Timer Sound Settings Row -->
+  <object class="GtkBox" id="timer_sound_box">
+    <property name="orientation">vertical</property>
+    <property name="spacing">12</property>
+    <property name="margin-top">12</property>
+    <property name="margin-bottom">12</property>
+    <property name="margin-start">12</property>
+    <property name="margin-end">12</property>
+
+    <child>
+      <object class="GtkLabel">
+        <property name="label" translatable="yes">Timer Sound</property>
+        <property name="xalign">0</property>
+        <style>
+          <class name="title-2"/>
+        </style>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+
+        <child>
+          <object class="GtkLabel">
+            <property name="label" translatable="yes">Sound Folder</property>
+            <property name="xalign">0</property>
+            <style>
+              <class name="caption"/>
+            </style>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">6</property>
+
+            <child>
+              <object class="GtkEntry" id="timer_folder_entry">
+                <property name="placeholder-text" translatable="yes">Select a folder</property>
+                <property name="editable">false</property>
+                <property name="hexpand">true</property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkButton" id="timer_folder_button">
+                <property name="label" translatable="yes">Browse</property>
+                <property name="tooltip-text" translatable="yes">Choose folder containing .ogg sound files</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+
+        <child>
+          <object class="GtkLabel">
+            <property name="label" translatable="yes">Sound File</property>
+            <property name="xalign">0</property>
+            <style>
+              <class name="caption"/>
+            </style>
+          </object>
+        </child>
+
+        <child>
+          <object class="GtkComboBoxText" id="timer_sound_combo">
+            <property name="active">0</property>
+            <property name="tooltip-text" translatable="yes">Select timer sound file</property>
+          </object>
+        </child>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkButton" id="timer_preview_button">
+        <property name="label" translatable="yes">Preview Sound</property>
+        <property name="tooltip-text" translatable="yes">Play a preview of the selected timer sound</property>
+        <style>
+          <class name="suggested-action"/>
+        </style>
+      </object>
+    </child>
+  </object>
+</interface>
