@@ -2,6 +2,47 @@
 
 All notable changes to Better GNOME Clocks will be documented in this file.
 
+## [1.1.0] - 2026-01-29
+
+### Added
+- **Multiple Timers**: Create and manage multiple timers simultaneously, similar to alarm functionality
+- **Timer Queue System**: Timers ring sequentially one at a time, with automatic queue processing
+- **Named Timers**: Optional custom names for each timer for easy identification
+- **Empty State UI**: Clean "No Timers" message with Add Timer button when no timers exist
+- **Timer Editing**: Click on any stopped timer to edit its duration and name
+- **Inline Title Editing**: Edit timer names directly in the timer list view
+- **Delete from Edit Dialog**: Remove timers via delete button in edit dialog
+- **Keyboard Shortcuts**: Press Enter to save in timer/alarm creation and editing dialogs
+- **Hover Effects**: Visual feedback when hovering over timer rows
+- **Timer Icon**: Distinct timer-symbolic icon in ringing modal (different from alarm icon)
+
+### Changed
+- **Timer Persistence**: Enhanced serialization to save timer state and remaining time
+- **Background Operation**: Timers continue running when app is closed using hold/release pattern
+- **Notification System**: System notifications appear when window is closed, with Stop button
+- **Timer UI**: Redesigned timer tab with list-based layout supporting multiple timers
+- **Dialog Sizing**: Compact timer dialog (480x420) with proper spacing and margins
+- **Click Handling**: Smart click detection excluding buttons and entry fields from edit trigger
+- **Name Display**: Timer names shown when running/paused, editable when stopped
+
+### Fixed
+- Button clicks triggering edit dialog (now properly excluded)
+- Timer names not updating after editing
+- Infinite loop when changing timer names
+- Enter key not working in timer setup dialog
+- Title field not maintaining proper spacing from dialog top
+- Timer name visibility logic for different timer states
+
+### Technical Details
+- GLib.Queue for sequential timer ringing
+- GLib.HashTable for duplicate timer prevention in queue
+- Widget ancestry checking for proper click event filtering
+- EventControllerKey with CAPTURE phase for Enter key handling
+- Property binding with cycle prevention for name synchronization
+- State-aware UI updates (reset/start/pause/ring states)
+
+---
+
 ## [1.0.0] - 2026-01-28
 
 ### Added

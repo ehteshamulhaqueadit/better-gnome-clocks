@@ -51,7 +51,7 @@
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkImage">
-                    <property name="icon_name">alarm-symbolic</property>
+                    <property name="icon_name">timer-symbolic</property>
                     <property name="pixel_size">64</property>
                     <style>
                       <class name="accent"/>

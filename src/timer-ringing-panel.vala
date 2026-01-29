@@ -22,17 +22,8 @@ namespace Timer {
 
 [GtkTemplate (ui = "/org/gnome/clocks/ui/timer-ringing-panel.ui")]
 private class RingingPanel : Adw.Bin {
-    public Item? timer {
-        get {
-            return _timer;
-        }
-        set {
-            _timer = value;
-            update ();
-        }
-    }
-
-    private Item? _timer;
+    private Item? current_timer;
+    
     [GtkChild]
     private unowned Gtk.Label title_label;
     [GtkChild]
@@ -40,23 +31,29 @@ private class RingingPanel : Adw.Bin {
 
     construct {
         stop_button.clicked.connect (() => {
-            dismiss ();
+            dismiss_timer ();
         });
     }
 
-    public virtual signal void dismiss () {
-        timer = null;
+    public void set_timer (Item timer) {
+        current_timer = timer;
+        update_display ();
     }
-
-    private void update () {
-        if (timer != null) {
-            if (timer.name != null && timer.name.length > 0) {
-                title_label.label = (string) timer.name;
+    
+    private void update_display () {
+        if (current_timer != null) {
+            if (current_timer.name != null && current_timer.name.length > 0) {
+                title_label.label = (string) current_timer.name;
             } else {
                 title_label.label = _("Timer");
             }
-        } else {
-            title_label.label = "";
+        }
+    }
+
+    public virtual signal void dismiss_timer () {
+        if (current_timer != null) {
+            current_timer.reset ();
+            current_timer = null;
         }
     }
 }

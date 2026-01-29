@@ -24,6 +24,8 @@ namespace Timer {
 public class Setup : Gtk.Box {
     public signal void duration_changed (int seconds);
     [GtkChild]
+    private unowned Gtk.Entry name_entry;
+    [GtkChild]
     private unowned Gtk.SpinButton h_spinbutton;
     [GtkChild]
     private unowned Gtk.SpinButton m_spinbutton;
@@ -65,7 +67,19 @@ public class Setup : Gtk.Box {
     }
 
     public Item get_timer () {
-        return (new Item.from_seconds (get_duration (), ""));
+        var name = name_entry.get_text ().strip ();
+        return (new Item.from_seconds (get_duration (), name.length > 0 ? name : null));
+    }
+    
+    /**
+     * Sets the dialog values from an existing timer.
+     * Used when editing a timer.
+     */
+    public void set_timer (Item timer) {
+        h_spinbutton.value = timer.hours;
+        m_spinbutton.value = timer.minutes;
+        s_spinbutton.value = timer.seconds;
+        name_entry.text = timer.name ?? "";
     }
 
     [GtkCallback]

@@ -4,43 +4,25 @@
     <child>
       <object class="GtkStack" id="stack">
         <property name="transition-type">crossfade</property>
+        <property name="hhomogeneous">False</property>
+        <property name="vhomogeneous">False</property>
         <child>
           <object class="GtkStackPage">
             <property name="name">empty</property>
             <property name="child">
-              <object class="GtkBox" id="no_timer_container">
-                <property name="halign">center</property>
-                <property name="valign">center</property>
-                <property name="orientation">vertical</property>
-                <property name="spacing">18</property>
+              <object class="AdwStatusPage" id="empty_view">
+                <property name="icon_name">alarm-symbolic</property>
+                <property name="title" translatable="yes">No Timers</property>
+                <property name="description" translatable="yes">Click the + button to create a new timer</property>
                 <child>
-                  <object class="GtkLabel">
-                    <property name="label" translatable="yes">Select Duration</property>
-                    <style>
-                      <class name="timer-header"/>
-                    </style>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkButton" id="start_button">
+                  <object class="GtkButton">
+                    <property name="action-name">win.new</property>
+                    <property name="label" translatable="yes">Add _Timer</property>
+                    <property name="use-underline">True</property>
                     <property name="halign">center</property>
-                    <property name="valign">center</property>
-                    <property name="icon_name">media-playback-start-symbolic</property>
                     <style>
-                      <class name="circular"/>
-                      <class name="large-button"/>
                       <class name="suggested-action"/>
-                    </style>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkButton" id="stop_button">
-                    <property name="halign">center</property>
-                    <property name="valign">center</property>
-                    <property name="icon_name">media-playback-stop-symbolic</property>
-                    <style>
-                      <class name="circular"/>
-                      <class name="large-button"/>
+                      <class name="pill"/>
                     </style>
                   </object>
                 </child>
@@ -75,9 +57,6 @@
             </property>
           </object>
         </child>
-        <style>
-          <class name="timer-panel"/>
-        </style>
       </object>
     </child>
   </template>

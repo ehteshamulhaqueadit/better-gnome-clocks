@@ -164,6 +164,21 @@ private class SetupDialog : Gtk.Dialog {
         }
 
         set_from_alarm (alarm);
+        
+        // Handle Enter key to accept dialog - use capture phase to get key before spinbuttons
+        var key_controller = new Gtk.EventControllerKey ();
+        key_controller.set_propagation_phase (Gtk.PropagationPhase.CAPTURE);
+        key_controller.key_pressed.connect ((keyval, keycode, state) => {
+            if (keyval == Gdk.Key.Return || keyval == Gdk.Key.KP_Enter) {
+                // Only trigger if not holding Shift/Ctrl/Alt
+                if ((state & (Gdk.ModifierType.SHIFT_MASK | Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.ALT_MASK)) == 0) {
+                    this.response (Gtk.ResponseType.OK);
+                    return true;
+                }
+            }
+            return false;
+        });
+        ((Gtk.Widget)this).add_controller (key_controller);
     }
 
     private static string duration_label (Duration item) {

@@ -1,28 +1,32 @@
 # Better GNOME Clocks
 
-An enhanced version of GNOME Clocks with custom sound support, continuous looping sounds, and improved timer notifications.
+An enhanced version of GNOME Clocks with custom sound support, multiple timers, and improved user experience.
 
-## Features
+## ✨ Key Features
 
-### ✨ Enhanced Features
+### 🎯 Multiple Timers (v1.1.0)
+- **Create Multiple Timers**: Run multiple timers simultaneously, just like alarms
+- **Named Timers**: Give each timer a custom name for easy identification
+- **Sequential Ringing**: Timers ring one at a time in a queue system
+- **Background Operation**: Timers continue running when app is closed
+- **Quick Edit**: Click any stopped timer to edit duration and name
+- **Inline Editing**: Edit timer names directly in the list
+- **Empty State**: Clean UI with helpful prompts when no timers exist
+- **Keyboard Shortcuts**: Press Enter to save in dialogs
+
+### 🎵 Sound Management (v1.0.0)
 - **Custom Timer Sounds**: Set your own sound file for timer completion
 - **Custom Alarm Sounds**: Set your own sound file for alarms  
-- **Continuous Sound Looping**: Both alarm and timer sounds loop continuously until stopped
-- **Timer Ringing Modal**: Full-screen modal panel when timer completes (like alarm panel)
-- **Sound Preferences**: Easy-to-use interface for managing custom sounds with preview
-- **Non-blocking Playback**: Sounds play in background threads without freezing UI
+- **Continuous Sound Looping**: Both alarm and timer sounds loop until stopped
+- **Sound Preferences**: Easy-to-use interface with preview functionality
+- **Non-blocking Playback**: Sounds play in background without freezing UI
+- **Fallback System**: Automatic fallback to system sounds if custom sound unavailable
 
-### 🎵 Sound Management
-- Browse and select custom sound files (.ogg, .mp3, .wav)
-- Preview sounds before applying
-- Fallback to system sounds if custom sound not available
-- Continuous looping until user clicks Stop/Snooze
-
-### 🔔 Timer Enhancements
-- Visual modal panel appears when timer completes
-- Large "Stop" button to dismiss and stop sound
-- Sound loops continuously until stopped
-- Consistent UX with alarm ringing panel
+### 🔔 Enhanced Notifications
+- **Timer Ringing Modal**: Full-screen modal panel when timer completes
+- **System Notifications**: Notifications with Stop button when window closed
+- **Distinct Icons**: Different icons for timer vs alarm notifications
+- **Visual Feedback**: Hover effects and smooth animations
 
 ## Installation
 

@@ -26,7 +26,6 @@
         </child>
         <child>
           <object class="ClocksTimerRingingPanel" id="timer_ringing_panel">
-            <signal name="dismiss" handler="timer_dismissed"/>
           </object>
         </child>
         <child>

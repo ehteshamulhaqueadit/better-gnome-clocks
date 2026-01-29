@@ -1,6 +1,42 @@
-build
-_build
+# Build directories
+build/
+_build/
 *~
-.vscode
+
+# IDE
+.vscode/
+.idea/
+
+# Flatpak
 .flatpak-builder/
 .flatpak/
+.flatpak-build/
+.flatpak-repo/
+
+# Release artifacts (kept in releases/ directory)
+*.deb
+*.rpm
+*.flatpak
+*.pkg.tar.zst
+*.tar.gz
+*.tar.xz
+*.sha256
+releases/
+deb-package/
+flatpak-release/
+release-v*/
+
+# Package build files
+better-gnome-clocks.spec
+PKGBUILD
+build-*.sh
+setup.sh
+
+# Documentation not needed in repo
+GITHUB_READY.txt
+GITHUB_RELEASE_DESCRIPTION.md
+RELEASE_NOTES.md
+RELEASE_PACKAGES_SUMMARY.md
+RELEASE_v*.txt
+CLEANUP_NOTES.md
+IMPLEMENTATION_SUMMARY.md

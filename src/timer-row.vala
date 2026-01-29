@@ -30,12 +30,20 @@ public class Row : Gtk.ListBoxRow {
         construct set {
             _item = value;
 
-            title.text = (string) _item.name;
+            title.text = _item.name ?? "";
             title.bind_property ("text", _item, "name");
-            timer_name.label = (string) _item.name;
+            timer_name.label = _item.name ?? "";
             title.bind_property ("text", timer_name, "label");
 
-            _item.notify["name"].connect (() => edited ());
+            _item.notify["name"].connect (() => {
+                // Update title entry when name is changed externally (e.g., from edit dialog)
+                // Only update if different to avoid infinite loop
+                var new_name = _item.name ?? "";
+                if (title.text != new_name) {
+                    title.text = new_name;
+                }
+                edited ();
+            });
         }
     }
     private Item _item;
@@ -67,9 +75,31 @@ public class Row : Gtk.ListBoxRow {
 
     public signal void deleted ();
     public signal void edited ();
+    public signal void edit_clicked ();
 
     public Row (Item item) {
         Object (item: item);
+        
+        // Add click handler for editing
+        var click_controller = new Gtk.GestureClick ();
+        click_controller.pressed.connect ((n_press, x, y) => {
+            if (n_press == 1) {  // Single click
+                // Don't trigger edit if clicking on buttons or entry fields
+                var widget = this.pick (x, y, Gtk.PickFlags.DEFAULT);
+                if (widget != null) {
+                    // Check if clicked widget or its parent is a button or entry
+                    var parent = widget;
+                    while (parent != null && parent != this) {
+                        if (parent is Gtk.Button || parent is Gtk.Entry) {
+                            return;  // Don't edit when clicking buttons or entry fields
+                        }
+                        parent = parent.get_parent ();
+                    }
+                }
+                edit_clicked ();
+            }
+        });
+        this.add_controller (click_controller);
 
         // Force LTR since we do not want to reverse [hh] : [mm] : [ss]
         countdown_label.set_direction (Gtk.TextDirection.LTR);
@@ -80,6 +110,12 @@ public class Row : Gtk.ListBoxRow {
         item.pause.connect (() => this.pause ());
         item.reset.connect (() => this.reset ());
         delete_button.clicked.connect (() => deleted ());
+
+        // Handle Enter key in title entry to remove focus (cursor disappears but stays in edit mode)
+        title.activate.connect (() => {
+            // Just remove focus from the entry, don't switch to display mode
+            this.grab_focus ();
+        });
 
         var target = new Adw.CallbackAnimationTarget (animation_target);
         paused_animation = new Adw.TimedAnimation (this, 0, 2, 2000, target);
@@ -114,7 +150,7 @@ public class Row : Gtk.ListBoxRow {
         paused_animation.pause ();
 
         start_stack.visible_child_name = "start";
-        name_revealer.reveal_child = true;
+        name_revealer.reveal_child = true;  // Always show in reset state for editing
         name_stack.visible_child_name = "edit";
 
         update_countdown (item.hours, item.minutes, item.seconds);
@@ -130,7 +166,8 @@ public class Row : Gtk.ListBoxRow {
         delete_stack.visible_child_name = "empty";
 
         start_stack.visible_child_name = "pause";
-        name_revealer.reveal_child = (timer_name.label != "");
+        // Show name when running if it's not empty
+        name_revealer.reveal_child = (timer_name.label != "" && timer_name.label != null);
         name_stack.visible_child_name = "display";
     }
 
@@ -147,7 +184,8 @@ public class Row : Gtk.ListBoxRow {
         reset_stack.visible_child_name = "button";
         delete_stack.visible_child_name = "button";
         start_stack.visible_child_name = "start";
-        name_revealer.reveal_child = (timer_name.label != "");
+        // Show name when paused if it's not empty
+        name_revealer.reveal_child = (timer_name.label != "" && timer_name.label != null);
         name_stack.visible_child_name = "display";
     }
 

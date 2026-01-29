@@ -120,8 +120,16 @@ public class Window : Adw.ApplicationWindow {
         timer.ring.connect ((w, t) => {
             close_standalone ();
             stack.visible_child = w;
-            timer_ringing_panel.timer = t;
+            timer_ringing_panel.set_timer (t);
             alarm_leaflet.visible_child = timer_ringing_panel;
+        });
+
+        timer_ringing_panel.dismiss_timer.connect (() => {
+            var has_next = timer.stop_timer_sound ();
+            // Only navigate back if there's no next timer (stop_timer_sound returns false)
+            if (!has_next) {
+                alarm_leaflet.visible_child = world_leaflet;
+            }
         });
 
 
@@ -225,7 +233,6 @@ public class Window : Adw.ApplicationWindow {
 
         get_default_size (out width, out height);
 
-        debug ("Saving window geometry: %i × %i", width, height);
 
         settings.set ("size", "(ii)", width, height);
 
@@ -236,6 +243,25 @@ public class Window : Adw.ApplicationWindow {
     [GtkCallback]
     private void enter_cb (Gtk.EventControllerFocus controller) {
         ((Application) application).withdraw_notifications ();
+    }
+
+    /**
+     * Stops the currently ringing timer.
+     * Called from notification action button.
+     * 
+     * - Stops current timer's sound
+     * - If there are queued timers, keeps ringing panel visible for next timer
+     * - If no more timers, navigates back to timer list
+     * - Presents the window to user
+     */
+    public void stop_timer () {
+        var has_next = timer.stop_timer_sound ();
+        // Only navigate back if queue is empty
+        if (!has_next) {
+            alarm_leaflet.visible_child = world_leaflet;
+        }
+        // Bring window to front
+        present ();
     }
 
     [GtkCallback]
@@ -351,12 +377,6 @@ public class Window : Adw.ApplicationWindow {
 
     [GtkCallback]
     private void alarm_dismissed () {
-        alarm_leaflet.visible_child = world_leaflet;
-    }
-
-    [GtkCallback]
-    private void timer_dismissed () {
-        timer.stop_timer_sound ();
         alarm_leaflet.visible_child = world_leaflet;
     }
 

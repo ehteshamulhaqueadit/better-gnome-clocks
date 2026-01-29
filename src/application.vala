@@ -27,6 +27,7 @@ public class Application : Adw.Application {
     const GLib.ActionEntry[] ACTION_ENTRIES = {
         { "stop-alarm", null, "s" },
         { "snooze-alarm", null, "s" },
+        { "stop-timer", on_stop_timer_activate },
         { "quit", on_quit_activate },
         { "add-location", on_add_location_activate, "v" }
     };
@@ -157,6 +158,16 @@ public class Application : Adw.Application {
         base.shutdown ();
 
         withdraw_notifications ();
+    }
+
+    /**
+     * Handles stop-timer action from notification button.
+     * Opens window and stops the currently ringing timer.
+     * If there are queued timers, the next one will start ringing.
+     */
+    void on_stop_timer_activate () {
+        var win = ensure_window ();
+        win.stop_timer ();
     }
 
     void on_quit_activate () {
