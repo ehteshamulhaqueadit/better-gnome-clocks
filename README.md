@@ -28,6 +28,24 @@ An enhanced version of GNOME Clocks with custom sound support, multiple timers, 
 - **Distinct Icons**: Different icons for timer vs alarm notifications
 - **Visual Feedback**: Hover effects and smooth animations
 
+## 📸 Screenshots & Demo
+
+### 🎬 Demo
+![Better GNOME Clocks Demo](screenshots/demo.gif)
+
+### 🕒 Multiple Timers
+![Multiple Timers](screenshots/multiple%20timer.png)
+
+### ⏱️ Edit Timer
+![Edit Timer](screenshots/edit%20timer.png)
+
+### 🔔 Timer Ringing
+![Timer Ringing](screenshots/ring%20timer.png)
+
+### 🎵 Custom Sound Settings
+![Custom Sound Settings](screenshots/custom%20sound.png)
+
+
 ## Installation
 
 ### Dependencies
